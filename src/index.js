@@ -283,8 +283,8 @@ function _render(dt, newTime) {
     motionBlur.enabled = !!settings.motionBlur;
     bloom.enabled = !!settings.bloom;
 
-    // _renderer.render(_scene, _camera);
-    postprocessing.render(dt, newTime);
+    _renderer.render(_scene, _camera);
+    // postprocessing.render(dt, newTime);
 
 }
 

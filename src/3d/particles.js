@@ -55,6 +55,9 @@ function _createParticleMesh() {
     var geometry = new THREE.BufferGeometry();
     geometry.addAttribute( 'position', new THREE.BufferAttribute( position, 3 ));
 
+    var vertexShader1 = shaderParse(glslify('../glsl/particles.vert'))
+    var fragmentShader1 = shaderParse(glslify('../glsl/particles.frag'))
+
     var material = new THREE.ShaderMaterial({
         uniforms: THREE.UniformsUtils.merge([
             THREE.UniformsLib.shadowmap,
@@ -64,40 +67,51 @@ function _createParticleMesh() {
                 color2: { type: 'c', value: undef }
             }
         ]),
-        vertexShader: shaderParse(glslify('../glsl/particles.vert')),
-        fragmentShader: shaderParse(glslify('../glsl/particles.frag')),
+        vertexShader: vertexShader1,
+        fragmentShader: fragmentShader1,
         blending: THREE.NoBlending
     });
+
 
     material.uniforms.color1.value = _color1;
     material.uniforms.color2.value = _color2;
 
     var mesh = new THREE.Points( geometry, material );
 
+    var vertexShader2 = shaderParse(glslify('../glsl/particlesDistance.vert'))
+    var fragmentShader2 = shaderParse(glslify('../glsl/particlesDistance.frag'))
+
     mesh.customDistanceMaterial = new THREE.ShaderMaterial( {
         uniforms: {
             lightPos: { type: 'v3', value: new THREE.Vector3( 0, 0, 0 ) },
             texturePosition: { type: 't', value: undef }
         },
-        vertexShader: shaderParse(glslify('../glsl/particlesDistance.vert')),
-        fragmentShader: shaderParse(glslify('../glsl/particlesDistance.frag')),
+        vertexShader: vertexShader2,
+        fragmentShader: fragmentShader2,
         depthTest: true,
         depthWrite: true,
         side: THREE.BackSide,
         blending: THREE.NoBlending
     });
 
-    mesh.motionMaterial = new MeshMotionMaterial( {
-        uniforms: {
-            texturePosition: { type: 't', value: undef },
-            texturePrevPosition: { type: 't', value: undef }
-        },
-        vertexShader: shaderParse(glslify('../glsl/particlesMotion.vert')),
-        depthTest: true,
-        depthWrite: true,
-        side: THREE.DoubleSide,
-        blending: THREE.NoBlending
-    });
+
+    // blame chuncks
+    console.log("====== CHUNK START ======")
+    console.log(shaderParse(glslify('../glsl/unchunk.glsl')))
+    console.log("====== CHUNK END ======")
+
+
+    // mesh.motionMaterial = new MeshMotionMaterial( {
+    //     uniforms: {
+    //         texturePosition: { type: 't', value: undef },
+    //         texturePrevPosition: { type: 't', value: undef }
+    //     },
+    //     vertexShader: shaderParse(glslify('../glsl/particlesMotion.vert')),
+    //     depthTest: true,
+    //     depthWrite: true,
+    //     side: THREE.DoubleSide,
+    //     blending: THREE.NoBlending
+    // });
 
     mesh.castShadow = true;
     mesh.receiveShadow = true;
@@ -229,8 +243,9 @@ function _createTriangleMesh() {
 function update(dt) {
     var mesh;
 
-    _triangleMesh.visible = settings.useTriangleParticles;
-    _particleMesh.visible = !settings.useTriangleParticles;
+    _particleMesh.visible = true
+    // _triangleMesh.visible = settings.useTriangleParticles;
+    // _particleMesh.visible = !settings.useTriangleParticles;
 
     _tmpColor.setStyle(settings.color1);
     _color1.lerp(_tmpColor, 0.05);
@@ -242,11 +257,11 @@ function update(dt) {
         mesh = _meshes[i];
         mesh.material.uniforms.texturePosition.value = simulator.positionRenderTarget;
         mesh.customDistanceMaterial.uniforms.texturePosition.value = simulator.positionRenderTarget;
-        mesh.motionMaterial.uniforms.texturePrevPosition.value = simulator.prevPositionRenderTarget;
-        if(mesh.material.uniforms.flipRatio ) {
-            mesh.material.uniforms.flipRatio.value ^= 1;
-            mesh.customDistanceMaterial.uniforms.flipRatio.value ^= 1;
-            mesh.motionMaterial.uniforms.flipRatio.value ^= 1;
-        }
+        // mesh.motionMaterial.uniforms.texturePrevPosition.value = simulator.prevPositionRenderTarget;
+        // if(mesh.material.uniforms.flipRatio ) {
+        //     mesh.material.uniforms.flipRatio.value ^= 1;
+        //     mesh.customDistanceMaterial.uniforms.flipRatio.value ^= 1;
+        //     mesh.motionMaterial.uniforms.flipRatio.value ^= 1;
+        // }
     }
 }

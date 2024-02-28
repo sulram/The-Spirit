@@ -26,7 +26,7 @@ exports.simulatorTextureWidth = amountInfo[0];
 exports.simulatorTextureHeight = amountInfo[1];
 
 exports.useTriangleParticles = true;
-exports.followMouse = true;
+exports.followMouse = false;
 
 exports.speed = 1;
 exports.dieSpeed = 0.015;
